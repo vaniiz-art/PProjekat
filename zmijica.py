@@ -78,10 +78,11 @@ while True:
 
         nova_glava=(glava_x_osa,glava_y_osa)
         zmijica.insert(0,nova_glava)
-        zmijica.pop()
         if nova_glava==hrana:
             hrana=kreiraj_hranu(zmijica)
-        
+        else:
+            zmijica.pop()
+
     screen.fill(crna)
     for dio in zmijica:
         pygame.draw.rect(screen,zelena,(dio[0],dio[1],blok,blok),border_radius=6)
