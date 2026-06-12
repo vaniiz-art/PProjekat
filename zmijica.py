@@ -19,17 +19,30 @@ font = pygame.font.SysFont("Arial", 30)
 crna=(15, 15, 15)
 zelena=(0, 220, 0)
 tamna_zelena=(0, 180, 0)
-
+crvena=(255,0,0)
 def kreiraj_zmijicu():
     return [
         (100, 100),
         (80, 100),
         (60, 100)
     ]
+def kreiraj_hranu(zmijica):
+
+    while True:
+
+        hrana_x = random.randrange(0, sirina, blok)
+        hrana_y = random.randrange(0, visina, blok)
+
+        if ((hrana_x, hrana_y) not in zmijica):
+
+            return (hrana_x, hrana_y)
+
+
 x_osa=blok
 y_osa=0
 trenutni_level=0
 zmijica=kreiraj_zmijicu()
+hrana=kreiraj_hranu(zmijica)
 kraj_igre=False
 
 while True:
@@ -66,11 +79,14 @@ while True:
         nova_glava=(glava_x_osa,glava_y_osa)
         zmijica.insert(0,nova_glava)
         zmijica.pop()
-        
+        if nova_glava==hrana:
+            hrana=kreiraj_hranu(zmijica)
         
     screen.fill(crna)
     for dio in zmijica:
         pygame.draw.rect(screen,zelena,(dio[0],dio[1],blok,blok),border_radius=6)
     pygame.draw.rect(screen,tamna_zelena,(zmijica[0][0],zmijica[0][1],blok,blok),border_radius=6)
+    pygame.draw.rect(screen,crvena,(hrana[0],hrana[1],blok,blok),border_radius=6)
+
     pygame.display.update()
     clock.tick(10)
