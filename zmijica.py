@@ -1,228 +1,90 @@
-import pygame
-import random
-import sys
+pe == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
 
-pygame.init()
+        if event.type == pygame.KEYDOWN:
 
-sirina = 800
-visina = 600
-blok = 20
+            if event.key == pygame.K_r:
+                reset()
 
-screen = pygame.display.set_mode((sirina, visina))
-pygame.display.set_caption("Snake Maze")
+            if event.key == pygame.K_UP and y_osa == 0:
+                x_osa = 0
+                y_osa = -blok
 
-clock = pygame.time.Clock()
-font = pygame.font.SysFont("Arial", 30)
-big_font = pygame.font.SysFont("Arial", 50)
+            elif event.key == pygame.K_DOWN and y_osa == 0:
+                x_osa = 0
+                y_osa = blok
 
-crna = (15, 15, 15)
-zelena = (0, 220, 0)
-tamna_zelena = (0, 180, 0)
-crvena = (255, 0, 0)
-bijela = (255, 255, 255)
-zid_boja = (70, 140, 70)
-zid_border = (40, 90, 40)
-zuta = (255, 220, 0)
+            elif event.key == pygame.K_LEFT and x_osa == 0:
+                x_osa = -blok
+                y_osa = 0
 
-
-def kreiraj_zmijicu():
-    return [(100, 100), (80, 100), (60, 100)]
+            elif event.key == pygame.K_RIGHT and x_osa == 0:
+                x_osa = blok
+                y_osa = 0
 
 
-def kreiraj_hranu(zmijica, zidovi):
-    while True:
-        x = random.randrange(0, sirina, blok)
-        y = random.randrange(0, visina, blok)
-        if (x, y) not in zmijica and (x, y) not in zidovi:
-            return (x, y)
+    if not kraj_igre:
+
+        hx = zmijica[0][0] + x_osa
+        hy = zmijica[0][1] + y_osa
+
+        nova = (hx, hy)
+
+        if hx < 0 or hx >= sirina or hy < 0 or hy >= visina:
+            kraj_igre = True
+
+        elif nova in zidovi:
+            kraj_igre = True
+
+        elif nova in zmijica:
+            kraj_igre = True
+
+        else:
+            zmijica.insert(0, nova)
+
+            if nova == hrana:
+
+                score += 1
+
+                if score % 5 == 0 and trenutni_level < len(leveli) - 1:
+
+                    trenutni_level += 1
+
+                    tranzicija(trenutni_level + 1)
+
+                    zidovi = napravi_zidove(leveli[trenutni_level]["map"])
+
+                    zmijica = kreiraj_zmijicu()
+
+                    x_osa = blok
+                    y_osa = 0
+
+                hrana = kreiraj_hranu(zmijica, zidovi)
+
+            else:
+                zmijica.pop()
 
 
-def napravi_zidove(mapa):
-    zidovi = []
-    for y, red in enumerate(mapa):
-        for x, znak in enumerate(red):
-            if znak == "#":
-                zidovi.append((x * blok, y * blok))
-    return zidovi
+    screen.fill(crna)
 
+    for z in zidovi:
+        pygame.draw.rect(screen, zid_boja, (z[0], z[1], blok, blok), border_radius=4)
+        pygame.draw.rect(screen, zid_border, (z[0], z[1], blok, blok), 2, border_radius=4)
 
-level1 = [
-"########################################",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"#......................................#",
-"########################################"
-]
+    for d in zmijica:
+        pygame.draw.rect(screen, zelena, (d[0], d[1], blok, blok), border_radius=6)
 
-level2 = [
-"########################################",
-"#..............####....................#",
-"#..............#..#....................#",
-"#..............#..#....................#",
-"#..............#..#....................#",
-"#..............#..#....................#",
-"#..............#..###########.........#",
-"#............................#.........#",
-"#........########............#.........#",
-"#........#......#............#.........#",
-"#........#......#......................#",
-"#........#......###########...........#",
-"#.....................................#",
-"#....########.........................#",
-"#.....................................#",
-"#..........##.........######..........#",
-"#....#......#.........................#",
-"#....#########.........#...............#",
-"#......................#...............#",
-"#......................######..........#",
-"#.....................................#",
-"#...........####..##..................#",
-"#...........#......#..................#",
-"#...........#......#..................#",
-"#..................#..................#",
-"#............#####.#..................#",
-"#.....................................#",
-"#.....................................#",
-"#.....................................#",
-"########################################"
-]
+    pygame.draw.rect(screen, tamna_zelena, (zmijica[0][0], zmijica[0][1], blok, blok), border_radius=6)
 
-level3 = [
-"########################################",
-"#....####..............####...........#",
-"#....#..#..............#..#...........#",
-"#....#..#..............#..#...........#",
-"#....#..##########.....#..#...........#",
-"#.....................................#",
-"#........######.......................#",
-"#........#....#.......................#",
-"#........#....###########.............#",
-"#.....................................#",
-"#....########.........................#",
-"#...........#.........................#",
-"#...........#........######...........#",
-"#...........#........#....#...........#",
-"#...........##########....#...........#",
-"#..........................#...........#",
-"#......................#####...........#",
-"#......................#...............#",
-"#......................#...............#",
-"#......................########........#",
-"#.....................................#",
-"#.....######..........................#",
-"#.....#....#..........................#",
-"#.....#....###########...............#",
-"#.....................................#",
-"#.................###..#..............#",
-"#.................#....#..............#",
-"#.................#...................#",
-"#.................#####...............#",
-"#.....................................#",
-"########################################"
-]
+    pygame.draw.rect(screen, crvena, (hrana[0], hrana[1], blok, blok), border_radius=6)
 
+    tekst = font.render(f"Score: {score}  Level: {trenutni_level+1}", True, bijela)
+    screen.blit(tekst, (10, 10))
 
-leveli = [
-    {"speed": 10, "map": level1},
-    {"speed": 13, "map": level2},
-    {"speed": 16, "map": level3}
-]
+    if kraj_igre:
+        g = font.render("GAME OVER - Press R", True, (255, 0, 0))
+        screen.blit(g, (220, 260))
 
-
-def reset():
-    global zmijica, x_osa, y_osa, score, trenutni_level, zidovi, hrana, kraj_igre
-
-    zmijica = kreiraj_zmijicu()
-    x_osa = blok
-    y_osa = 0
-    score = 0
-    trenutni_level = 0
-    zidovi = napravi_zidove(leveli[0]["map"])
-    hrana = kreiraj_hranu(zmijica, zidovi)
-    kraj_igre = False
-
-
-reset()
-
-
-def tranzicija(level):
-
-    next_map = leveli[trenutni_level]["map"]
-    next_zidovi = napravi_zidove(next_map)
-
-    start = pygame.time.get_ticks()
-    trajanje = 3000
-
-    while pygame.time.get_ticks() - start < trajanje:
-
-        screen.fill(crna)
-
-        for z in zidovi:
-            pygame.draw.rect(screen, zid_boja, (z[0], z[1], blok, blok), border_radius=4)
-
-        for d in zmijica:
-            pygame.draw.rect(screen, zelena, (d[0], d[1], blok, blok), border_radius=6)
-
-        pygame.draw.rect(screen, crvena, (hrana[0], hrana[1], blok, blok), border_radius=6)
-
-        ghost = pygame.Surface((sirina, visina), pygame.SRCALPHA)
-
-        for z in next_zidovi:
-            pygame.draw.rect(
-                ghost,
-                (255, 255, 255, 60),  
-                (z[0], z[1], blok, blok),
-                border_radius=3
-            )
-
-        screen.blit(ghost, (0, 0))
-
-        overlay = pygame.Surface((sirina, visina))
-        overlay.set_alpha(140)
-        overlay.fill((0, 0, 0))
-        screen.blit(overlay, (0, 0))
-
-        elapsed = pygame.time.get_ticks() - start
-        sek = 3 - int(elapsed / 1000)
-
-        t1 = big_font.render(f"LEVEL {level}", True, zuta)
-        t2 = font.render("Priprema za sledeci level...", True, bijela)
-        t3 = big_font.render(str(max(0, sek)), True, zelena)
-
-        screen.blit(t1, (250, 180))
-        screen.blit(t2, (210, 260))
-        screen.blit(t3, (390, 330))
-
-        pygame.display.update()
-        clock.tick(60)
-
-
-while True:
-
-    for event in pygame.event.get():
-        if event.ty
+    pygame.display.update()
+    clock.tick(leveli[trenutni_level]["speed"])
