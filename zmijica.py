@@ -18,6 +18,7 @@ crna = (15, 15, 15)
 zelena = (0, 220, 0)
 tamna_zelena = (0, 180, 0)
 crvena = (255, 0, 0)
+siva = (60, 60, 60)
 
 def kreiraj_zmijicu():
     return [
@@ -71,19 +72,27 @@ while True:
         glava_x_osa = zmijica[0][0] + x_osa
         glava_y_osa = zmijica[0][1] + y_osa
 
-        nova_glava = (glava_x_osa, glava_y_osa)
-
-        if nova_glava in zmijica:
+        if (
+            glava_x_osa < 0 or glava_x_osa >= sirina or
+            glava_y_osa < 0 or glava_y_osa >= visina
+        🙁
             kraj_igre = True
         else:
-            zmijica.insert(0, nova_glava)
+            nova_glava = (glava_x_osa, glava_y_osa)
 
-            if nova_glava == hrana:
-                hrana = kreiraj_hranu(zmijica)
+            if nova_glava in zmijica:
+                kraj_igre = True
             else:
-                zmijica.pop()
+                zmijica.insert(0, nova_glava)
+
+                if nova_glava == hrana:
+                    hrana = kreiraj_hranu(zmijica)
+                else:
+                    zmijica.pop()
 
     screen.fill(crna)
+
+    pygame.draw.rect(screen, siva, (0, 0, sirina, visina), 5)
 
     for dio in zmijica:
         pygame.draw.rect(screen, zelena, (dio[0], dio[1], blok, blok), border_radius=6)
@@ -95,12 +104,7 @@ while True:
         border_radius=6
     )
 
-    pygame.draw.rect(
-        screen,
-        crvena,
-        (hrana[0], hrana[1], blok, blok),
-        border_radius=6
-    )
+    pygame.draw.rect(screen, crvena, (hrana[0], hrana[1], blok, blok), border_radius=6)
 
     if kraj_igre:
         tekst = font.render("GAME OVER", True, (255, 0, 0))
